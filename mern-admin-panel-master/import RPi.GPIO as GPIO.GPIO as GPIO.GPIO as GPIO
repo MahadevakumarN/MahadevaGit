@@ -1,0 +1,44 @@
+import RPi.GPIO as GPIO
+import time
+
+# Define GPIO pins
+SOIL_MOISTURE_PIN = 17  # GPIO pin connected to the soil moisture sensor
+WATER_PUMP_PIN = 18      # GPIO pin connected to the water pump
+
+# Threshold for soil moisture (adjust as needed)
+MOISTURE_THRESHOLD = 50
+
+# Setup GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(SOIL_MOISTURE_PIN, GPIO.IN)
+GPIO.setup(WATER_PUMP_PIN, GPIO.OUT)
+
+def read_soil_moisture():
+    # Function to read soil moisture from sensor (you might need to calibrate this function)
+    moisture = GPIO.input(SOIL_MOISTURE_PIN)
+    return moisture
+
+def activate_pump():
+    # Function to activate the water pump
+    GPIO.output(WATER_PUMP_PIN, GPIO.HIGH)
+    print("Water pump activated")
+
+def deactivate_pump():
+    # Function to deactivate the water pump
+    GPIO.output(WATER_PUMP_PIN, GPIO.LOW)
+    print("Water pump deactivated")
+
+try:
+    while True:
+        moisture_level = read_soil_moisture()
+        print("Soil moisture level:", moisture_level)
+
+        if moisture_level < MOISTURE_THRESHOLD:
+            activate_pump()
+            time.sleep(10)  # Run the pump for 10 seconds (adjust as needed)
+            deactivate_pump()
+        
+        time.sleep(60)  # Check moisture level every minute (adjust as needed)
+
+except KeyboardInterrupt:
+    GPIO.cleanup()
